@@ -17,7 +17,7 @@ async function buildApp(options: AppOptions = {}) {
 
     fastify.log.info("Starting to load plugins");
     await fastify.register(AutoLoad, {
-      dir: join(__dirname, "plugins"),
+      dir: join(__dirname, "modules"),
       options: options,
       ignorePattern: /^((?!plugin).)*$/,
     });
