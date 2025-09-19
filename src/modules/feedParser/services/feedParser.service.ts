@@ -1,8 +1,9 @@
+import type { FastifyInstance } from "fastify";
 import Parser from "rss-parser";
 
 const parser = new Parser();
 
-export interface ItemFeed {
+interface ItemFeed {
   title?: string;
   link?: string;
   description?: string;
@@ -21,12 +22,17 @@ export interface Feed {
   [key: string]: unknown;
 }
 
-export async function parseFeed(url: string): Promise<Feed> {
+export async function parseFeed(
+  fastify: FastifyInstance,
+  url: string
+): Promise<Feed> {
   try {
+    fastify.log.info(`Parsing RSS feed: ${url}`);
     const feed = await parser.parseURL(url);
+    fastify.log.info(`Parsed feed successfully: ${feed.title || "No title"}`);
     return feed;
   } catch (error) {
-    console.error("Error parsing feed:", error);
+    fastify.log.error("Error parsing feed:", error);
     throw error;
   }
 }

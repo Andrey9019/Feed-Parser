@@ -1,7 +1,14 @@
 export const schema = {
   tags: ["feed"],
   summary: "Get feed data",
-  descpription: "Fetches and returns feed data from a specified URL.",
+  description: "Fetches and returns feed data from a specified URL.",
+  querystring: {
+    type: "object",
+    properties: {
+      url: { type: "string", format: "uri" },
+    },
+    required: [""],
+  },
 
   response: {
     200: {
