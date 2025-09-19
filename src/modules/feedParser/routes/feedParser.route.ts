@@ -18,13 +18,12 @@ export async function getFeedDataRoutes(fastify: FastifyInstance) {
           return reply.status(400).send({ error: "Invalid URL format" });
         }
 
-        const effectiveUrl =
-          url || "https://feeds.bbci.co.uk/ukrainian/rss.xml";
+        const effectiveUrl = url || "https://feeds.bbci.co.uk/ukrainian/rss.xml";
         const feed = await parseFeed(effectiveUrl);
         reply.send(feed);
       } catch (err) {
         reply.status(500).send({ error: "Failed to fetch feed data" });
       }
-    }
+    },
   );
 }
