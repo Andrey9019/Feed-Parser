@@ -11,14 +11,14 @@ export interface ItemFeed {
   contentSnippet?: string;
   guid?: string;
   isoDate?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export interface Feed {
   title?: string;
   description?: string;
   items: ItemFeed[];
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 export async function parseFeed(url: string): Promise<Feed> {
