@@ -1,0 +1,18 @@
+import buildApp from "./app";
+
+async function start() {
+  const fastify = await buildApp();
+
+  const port = fastify.config.PORT;
+  const host = fastify.config.HOST;
+
+  fastify.listen({ port, host }, (err, address) => {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
+    console.log(`Server running at ${address}`);
+  });
+}
+
+void start();
