@@ -5,7 +5,7 @@ export const EnvSchema = {
   properties: {
     PORT: { type: "number" },
     HOST: { type: "string" },
-    DEFAULT_RSS_URL: { type: "string" },
+    DEFAULT_RSS_URL: { type: "string", format: "uri" },
   },
   required: ["PORT", "HOST", "DEFAULT_RSS_URL"],
   additionalProperties: false,
