@@ -22,10 +22,7 @@ export interface Feed {
   [key: string]: unknown;
 }
 
-export async function parseFeed(
-  fastify: FastifyInstance,
-  url: string
-): Promise<Feed> {
+export async function parseFeed(fastify: FastifyInstance, url: string): Promise<Feed> {
   try {
     fastify.log.info(`Parsing RSS feed: ${url}`);
     const feed = await parser.parseURL(url);

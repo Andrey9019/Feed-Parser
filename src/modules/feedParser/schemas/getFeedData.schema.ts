@@ -6,8 +6,9 @@ export const schema = {
     type: "object",
     properties: {
       url: { type: "string", format: "uri" },
+      force: { type: "number", enum: [0, 1] },
     },
-    required: [""],
+    required: [],
   },
 
   response: {
