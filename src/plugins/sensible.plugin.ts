@@ -10,5 +10,5 @@ export default fp(
   },
   {
     name: pluginName,
-  }
+  },
 );
