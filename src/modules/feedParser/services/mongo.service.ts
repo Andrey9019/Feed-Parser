@@ -1,28 +1,38 @@
 import { PrismaClient } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
-import { MongoClient } from "mongodb";
-import type { Feed } from "./feedParser.service";
+import type { Feed, NewsItem } from "./feedParser.service";
 
 const prisma = new PrismaClient();
-// const mongoClient = new MongoClient(process.env.DATABASE_URL!);
-const mongoClient = new MongoClient("mongodb://localhost:27017");
-const db = mongoClient.db("feed-parser");
-const feedCollection = db.collection("feeds");
 
 export async function getFeedFromDB(
   fastify: FastifyInstance,
   url: string
-): Promise<Feed | null> {
+): Promise<NewsItem[] | null> {
   fastify.log.info(`Attempting to get feed from DB: ${url}`);
   try {
     fastify.log.info(`Getting feed from DB: ${url}`);
-    const feed = await prisma.feed.findUnique({ where: { url } });
-    if (feed) {
-      fastify.log.info(`Feed found in DB: ${url}`);
-      fastify.log.info(`Feed found in DB: ${feed}`);
-      return feed.data as Feed;
+    const dbItems = await prisma.news.findMany({
+      orderBy: {
+        pubDate: "desc",
+      },
+      take: 50,
+      // where: { link: { contains: url } },
+    });
+    if (dbItems.length === 0) {
+      fastify.log.info("No news items found in the database.");
+      return null;
     }
-    fastify.log.info(`No feed found in DB: ${url}`);
+    fastify.log.info("Found ${dbItems.length} items in the database.");
+    return dbItems.map((item) => ({
+      title: item.title,
+      link: item.link,
+      pubDate: item.pubDate.toISOString(),
+      contentSnippet: item.contentSnippet || "",
+      description: item.contentSnippet || "",
+      content: item.contentSnippet || "",
+
+      isoDate: item.pubDate.toISOString(),
+    }));
   } catch (error) {
     fastify.log.error(`Error getting feed from DB: ${url}`, error);
   }
@@ -31,31 +41,31 @@ export async function getFeedFromDB(
 
 export async function saveFeedToDB(
   fastify: FastifyInstance,
-  url: string,
-  data: Feed
+  feed: Feed
 ): Promise<void> {
-  fastify.log.info(`Attempting to save feed to DB: ${url}`);
+  fastify.log.info(
+    `[DB SAVE] Starting to save ${feed.items.length} items for feed: ${feed.title}`
+  );
   try {
-    await mongoClient.connect();
-    const existingFeed = await prisma.feed.findUnique({ where: { url } });
-    if (existingFeed) {
-      fastify.log.info(`Feed already exists in DB: ${url}`);
-      await feedCollection.updateOne(
-        { url },
-        { $set: { data, updatedAt: new Date() } }
-      );
-    } else {
-      fastify.log.info(`Creating new feed in DB: ${url}`);
-      await feedCollection.insertOne({
-        url,
-        data,
-        updatedAt: new Date(),
+    for (const item of feed.items) {
+      fastify.log.info(`[DB SAVE] Upserting item: ${item.link}`);
+      await prisma.news.upsert({
+        where: { link: item.link },
+        update: {
+          title: item.title || "",
+          pubDate: item.pubDate ? new Date(item.pubDate) : new Date(),
+          contentSnippet: item.contentSnippet || null,
+        },
+        create: {
+          title: item.title || "",
+          link: item.link,
+          pubDate: item.pubDate ? new Date(item.pubDate) : new Date(),
+          contentSnippet: item.contentSnippet || null,
+        },
       });
     }
-    fastify.log.info(`Saving feed to DB: ${url}`);
-
-    fastify.log.info(`Feed saved to DB: ${url}`);
+    fastify.log.info(`[DB SAVE] Finished saving items for feed: ${feed.title}`);
   } catch (error) {
-    fastify.log.error(`Error saving feed to BD${error}`);
+    fastify.log.error("[DB SAVE] Error during upsert process:", error);
   }
 }
