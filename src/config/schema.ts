@@ -6,6 +6,7 @@ export const EnvSchema = {
     PORT: { type: "number" },
     HOST: { type: "string" },
     DEFAULT_RSS_URL: { type: "string", format: "uri" },
+    JWT_SECRET: { type: "string" },
   },
   required: ["PORT", "HOST", "DEFAULT_RSS_URL"],
   additionalProperties: false,

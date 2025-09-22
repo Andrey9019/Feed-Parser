@@ -2,7 +2,11 @@ import { join } from "node:path";
 import AutoLoad from "@fastify/autoload";
 import Fastify, { type FastifyServerOptions } from "fastify";
 import configPlugin from "./config";
+import jwt from "@fastify/jwt";
+import fastifyBcrypt from "fastify-bcrypt";
+
 import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route";
+import { authRoutes } from "./modules/auth/routes/auth.route";
 
 export type AppOptions = Partial<FastifyServerOptions>;
 
@@ -44,6 +48,15 @@ async function buildApp(options: AppOptions = {}) {
   });
 
   fastify.register(getFeedDataRoutes);
+
+  await fastify.register(jwt, {
+    secret: fastify.config.JWT_SECRET || "supersecretkey",
+  });
+  await fastify.register(fastifyBcrypt, {
+    saltWorkFactor: 12,
+  });
+
+  await fastify.register(authRoutes);
 
   return fastify;
 }
