@@ -6,10 +6,10 @@ export const schema = {
     type: "object",
     properties: {
       url: { type: "string", format: "uri" },
+      force: { type: "number", enum: [0, 1] },
     },
-    required: [""],
+    required: [],
   },
-
   response: {
     200: {
       type: "object",
@@ -23,10 +23,10 @@ export const schema = {
             properties: {
               title: { type: "string" },
               link: { type: "string" },
+              pubDate: { type: "string" },
+              contentSnippet: { type: "string" },
               description: { type: "string" },
               content: { type: "string" },
-              contentSnippet: { type: "string" },
-              guid: { type: "string" },
               isoDate: { type: "string" },
             },
             required: [],
