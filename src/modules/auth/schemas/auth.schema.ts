@@ -7,9 +7,10 @@ export const registrSchema = {
       name: { type: "string" },
     },
     required: ["email", "password", "name"],
+    additionalProperties: false,
   },
   response: {
-    200: {
+    201: {
       type: "object",
       properties: {
         id: { type: "string" },
@@ -34,6 +35,7 @@ export const loginSchema = {
       password: { type: "string", minLength: 6 },
     },
     required: ["email", "password"],
+    additionalProperties: false,
   },
   response: {
     200: {
