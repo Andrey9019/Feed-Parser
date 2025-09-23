@@ -22,10 +22,12 @@
     "fastify-plugin": "^5.0.1",
     "json-schema-to-ts": "^3.1.1",
     "pino-pretty": "^13.1.1",
+    "promise-retry": "^2.0.1",
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {
     "@types/node": "^24.5.1",
+    "@types/promise-retry": "^1.1.6",
     "concurrently": "^9.2.1",
     "nodemon": "^3.1.10",
     "prisma": "^6.16.2",

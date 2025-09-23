@@ -2,6 +2,7 @@ import type { FastifyInstance } from "fastify";
 import Parser, { type Item } from "rss-parser";
 import { getFeedFromDB, saveFeedToDB } from "./mongo.service";
 import type { Feed } from "../types";
+import promiseRetry from "promise-retry";
 
 interface CustomItem extends Item {
   "content:encoded"?: string;
@@ -14,7 +15,25 @@ export async function parseFeed(
   url: string
 ): Promise<Feed | null> {
   try {
-    const feed = await parser.parseURL(url);
+    // const feed = await parser.parseURL(url);
+    const feed = await promiseRetry(
+      async (retry, number) => {
+        try {
+          return await parser.parseURL(url);
+        } catch (error) {
+          fastify.log.warn(`Retry attempt ${number} for URL: ${url}`);
+          if (number >= 3) {
+            throw error;
+          }
+          retry(error);
+        }
+      },
+      { retries: 3, minTimeout: 1000, maxTimeout: 4000 }
+    );
+    if (!feed) {
+      fastify.log.error(`Failed to parse feed for URL: ${url}`);
+      return null;
+    }
 
     return {
       title: feed.title || "Newss Feed",
