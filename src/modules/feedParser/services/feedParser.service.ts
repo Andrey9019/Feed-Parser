@@ -1,30 +1,13 @@
 import type { FastifyInstance } from "fastify";
 import Parser, { type Item } from "rss-parser";
 import { getFeedFromDB, saveFeedToDB } from "./mongo.service";
-import { Feed } from "../types";
+import type { Feed } from "../types";
 
 interface CustomItem extends Item {
   "content:encoded"?: string;
 }
 
 const parser = new Parser();
-
-// export interface NewsItem {
-//   title: string;
-//   link: string;
-//   image: string;
-//   pubDate: string;
-//   contentSnippet: string;
-//   content: string;
-//   isoDate: string;
-//   [key: string]: unknown;
-// }
-
-// export interface Feed {
-//   title: string;
-//   items: NewsItem[];
-//   [key: string]: unknown;
-// }
 
 export async function parseFeed(
   fastify: FastifyInstance,

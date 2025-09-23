@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
-import { Feed, NewsItem } from "../types";
-// import type { Feed, NewsItem } from "./feedParser.service";
+import type { Feed, NewsItem } from "../types";
 
 const prisma = new PrismaClient();
 

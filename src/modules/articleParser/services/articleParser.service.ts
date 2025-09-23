@@ -1,6 +1,6 @@
 import type { FastifyInstance } from "fastify";
 import * as cheerio from "cheerio";
-import { Article } from "../types";
+import type { Article } from "../types";
 
 export async function parseArticle(
   fastify: FastifyInstance,
