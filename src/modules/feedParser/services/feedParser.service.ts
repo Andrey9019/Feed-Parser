@@ -7,6 +7,7 @@ const parser = new Parser();
 export interface NewsItem {
   title: string;
   link: string;
+  image?: string;
   pubDate: string;
   contentSnippet: string;
   description: string;
@@ -18,6 +19,7 @@ export interface NewsItem {
 export interface Feed {
   title: string;
   description?: string;
+  image?: string;
   items: NewsItem[];
   [key: string]: unknown;
 }
@@ -36,6 +38,7 @@ export async function parseFeed(
       items: feed.items.map((item: Item) => ({
         title: item.title || "",
         link: item.link || "",
+        image: item.enclosure?.url,
         pubDate: item.pubDate || new Date().toUTCString(),
         contentSnippet: item.contentSnippet || "",
         description: item.contentSnippet || "",

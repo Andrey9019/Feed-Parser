@@ -22,6 +22,7 @@ export const schema = {
             type: "object",
             properties: {
               title: { type: "string" },
+              image: { type: "string" },
               link: { type: "string" },
               pubDate: { type: "string" },
               contentSnippet: { type: "string" },
