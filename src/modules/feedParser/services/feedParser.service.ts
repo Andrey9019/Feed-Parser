@@ -2,15 +2,18 @@ import type { FastifyInstance } from "fastify";
 import Parser, { type Item } from "rss-parser";
 import { getFeedFromDB, saveFeedToDB } from "./mongo.service";
 
+interface CustomItem extends Item {
+  "content:encoded"?: string;
+}
+
 const parser = new Parser();
 
 export interface NewsItem {
   title: string;
   link: string;
-  image?: string;
+  image: string;
   pubDate: string;
   contentSnippet: string;
-  description: string;
   content: string;
   isoDate: string;
   [key: string]: unknown;
@@ -18,8 +21,6 @@ export interface NewsItem {
 
 export interface Feed {
   title: string;
-  description?: string;
-  image?: string;
   items: NewsItem[];
   [key: string]: unknown;
 }
@@ -33,18 +34,25 @@ export async function parseFeed(
 
     return {
       title: feed.title || "Newss Feed",
-      description: feed.description || "",
-      link: feed.link || url,
-      items: feed.items.map((item: Item) => ({
-        title: item.title || "",
-        link: item.link || "",
-        image: item.enclosure?.url,
-        pubDate: item.pubDate || new Date().toUTCString(),
-        contentSnippet: item.contentSnippet || "",
-        description: item.contentSnippet || "",
-        content: item.content || "",
-        isoDate: item.isoDate || "",
-      })),
+      items: feed.items.map((item: CustomItem) => {
+        let image = "";
+
+        const html = item["content:encoded"] || image;
+        const srcMatch = html.match(/src=['"]([^'"]+)['"]/i);
+        if (srcMatch) {
+          image = srcMatch[1];
+        }
+
+        return {
+          title: item.title || "",
+          link: item.link || "",
+          image,
+          pubDate: item.pubDate || new Date().toUTCString(),
+          contentSnippet: item.contentSnippet || "",
+          content: item.content || "",
+          isoDate: item.isoDate || "",
+        };
+      }),
     };
   } catch (error) {
     fastify.log.error(`Error parsing feed: ${error}`);

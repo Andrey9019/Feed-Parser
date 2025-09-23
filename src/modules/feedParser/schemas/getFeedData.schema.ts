@@ -26,7 +26,6 @@ export const schema = {
               link: { type: "string" },
               pubDate: { type: "string" },
               contentSnippet: { type: "string" },
-              description: { type: "string" },
               content: { type: "string" },
               isoDate: { type: "string" },
             },

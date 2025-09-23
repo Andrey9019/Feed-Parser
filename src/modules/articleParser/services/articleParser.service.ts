@@ -1,5 +1,4 @@
 import type { FastifyInstance } from "fastify";
-// import { fromURL, load } from "cheerio";
 import * as cheerio from "cheerio";
 
 export interface Article {
