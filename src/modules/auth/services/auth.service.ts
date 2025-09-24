@@ -7,9 +7,6 @@ const prisma = new PrismaClient();
 export async function registerUser(
   fastify: FastifyInstance,
   body: { email: string; password: string; name: string }
-  // email: string,
-  // password: string,
-  // name: string
 ): Promise<User> {
   const { email, password, name } = body;
   fastify.log.info(`Registering user: ${email}`);
@@ -30,27 +27,30 @@ export async function registerUser(
 export async function loginUser(
   fastify: FastifyInstance,
   body: { email: string; password: string }
-  // email: string,
-  // password: string
-): Promise<{ token: string }> {
+): Promise<{
+  token: string;
+  user: { id: string; email: string; name: string };
+}> {
   const { email, password } = body;
+  fastify.log.info(`[Auth] Logging in user: ${email}`);
 
-  fastify.log.info(`Logging in user: ${email}`);
-  try {
-    const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || !(await fastify.bcrypt.compare(password, user.password))) {
-      throw new Error("Invalid credentials");
-    }
-    const token = fastify.jwt.sign(
-      { id: user.id, email: user.email },
-      { expiresIn: "1h" }
-    );
-    fastify.log.info(`User logged in: ${email}`);
-    fastify.log.info(`token type: ${typeof token}, value: ${token}`);
-    return { token: token as string };
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    fastify.log.error(`Error logging in user: ${message}`);
-    throw new Error(`Login failed: ${message}`);
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) {
+    fastify.log.warn(`[Auth] Invalid credentials for ${email}: User not found`);
+    throw new Error("Invalid credentials");
   }
+
+  const isValid = await fastify.bcrypt.compare(password, user.password);
+  if (!isValid) {
+    fastify.log.warn(`[Auth] Invalid credentials for ${email}: Wrong password`);
+    throw new Error("Invalid credentials");
+  }
+
+  const token = fastify.jwt.sign({ userId: user.id, email: user.email });
+  const response = {
+    token,
+    user: { id: user.id, email: user.email, name: user.name },
+  };
+  fastify.log.info(`[Auth] User logged in: ${email}`);
+  return response;
 }
