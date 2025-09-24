@@ -1,47 +1,61 @@
 import type { FastifyInstance } from "fastify";
 import Parser, { type Item } from "rss-parser";
 import { getFeedFromDB, saveFeedToDB } from "./mongo.service";
+import type { Feed } from "../types";
+import promiseRetry from "promise-retry";
+
+interface CustomItem extends Item {
+  "content:encoded"?: string;
+}
 
 const parser = new Parser();
-
-export interface NewsItem {
-  title: string;
-  link: string;
-  pubDate: string;
-  contentSnippet: string;
-  description: string;
-  content: string;
-  isoDate: string;
-  [key: string]: unknown;
-}
-
-export interface Feed {
-  title: string;
-  description?: string;
-  items: NewsItem[];
-  [key: string]: unknown;
-}
 
 export async function parseFeed(
   fastify: FastifyInstance,
   url: string
 ): Promise<Feed | null> {
   try {
-    const feed = await parser.parseURL(url);
+    // const feed = await parser.parseURL(url);
+    const feed = await promiseRetry(
+      async (retry, number) => {
+        try {
+          return await parser.parseURL(url);
+        } catch (error) {
+          fastify.log.warn(`Retry attempt ${number} for URL: ${url}`);
+          if (number >= 3) {
+            throw error;
+          }
+          retry(error);
+        }
+      },
+      { retries: 3, minTimeout: 1000, maxTimeout: 4000 }
+    );
+    if (!feed) {
+      fastify.log.error(`Failed to parse feed for URL: ${url}`);
+      return null;
+    }
 
     return {
       title: feed.title || "Newss Feed",
-      description: feed.description || "",
-      link: feed.link || url,
-      items: feed.items.map((item: Item) => ({
-        title: item.title || "",
-        link: item.link || "",
-        pubDate: item.pubDate || new Date().toUTCString(),
-        contentSnippet: item.contentSnippet || "",
-        description: item.contentSnippet || "",
-        content: item.content || "",
-        isoDate: item.isoDate || "",
-      })),
+      items: feed.items.map((item: CustomItem) => {
+        let image = "";
+
+        const html = item["content:encoded"] || image;
+        const srcMatch = html.match(/src=['"]([^'"]+)['"]/i);
+        if (srcMatch) {
+          image = srcMatch[1];
+        }
+
+        return {
+          title: item.title || "",
+          link: item.link || "",
+          image,
+          pubDate: item.pubDate || new Date().toUTCString(),
+          contentSnippet: item.contentSnippet || "",
+          content: item.content || "",
+          isoDate: item.isoDate || "",
+        };
+      }),
     };
   } catch (error) {
     fastify.log.error(`Error parsing feed: ${error}`);

@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import type { FastifyInstance } from "fastify";
-import type { Feed, NewsItem } from "./feedParser.service";
+import type { Feed, NewsItem } from "../types";
 
 const prisma = new PrismaClient();
 
@@ -26,11 +26,11 @@ export async function getFeedFromDB(
     return dbItems.map((item) => ({
       title: item.title,
       link: item.link,
+      image: item.image,
       pubDate: item.pubDate.toISOString(),
       contentSnippet: item.contentSnippet || "",
-      description: item.contentSnippet || "",
-      content: item.contentSnippet || "",
 
+      content: item.contentSnippet || "",
       isoDate: item.pubDate.toISOString(),
     }));
   } catch (error) {
@@ -53,12 +53,14 @@ export async function saveFeedToDB(
         where: { link: item.link },
         update: {
           title: item.title || "",
+          image: item.image || "",
           pubDate: item.pubDate ? new Date(item.pubDate) : new Date(),
           contentSnippet: item.contentSnippet || null,
         },
         create: {
           title: item.title || "",
           link: item.link,
+          image: item.image || "",
           pubDate: item.pubDate ? new Date(item.pubDate) : new Date(),
           contentSnippet: item.contentSnippet || null,
         },

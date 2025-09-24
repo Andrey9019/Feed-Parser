@@ -11,6 +11,7 @@ model News {
   id             String   @id @default(auto()) @map("_id") @db.ObjectId
   title          String
   link           String   @unique
+  image          String
   pubDate        DateTime
   contentSnippet String?
   createdAt      DateTime @default(now())

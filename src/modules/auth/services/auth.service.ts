@@ -1,13 +1,8 @@
 import type { FastifyInstance } from "fastify";
 import { PrismaClient } from "@prisma/client";
+import type { User } from "../types";
 
 const prisma = new PrismaClient();
-
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-}
 
 export async function registerUser(
   fastify: FastifyInstance,

@@ -7,6 +7,7 @@ import fastifyBcrypt from "fastify-bcrypt";
 
 import { getFeedDataRoutes } from "./modules/feedParser/routes/feedParser.route";
 import { authRoutes } from "./modules/auth/routes/auth.route";
+import { articleParserRoutes } from "./modules/articleParser/routes/articleParser.route";
 
 export type AppOptions = Partial<FastifyServerOptions>;
 
@@ -57,6 +58,8 @@ async function buildApp(options: AppOptions = {}) {
   });
 
   await fastify.register(authRoutes);
+
+  await fastify.register(articleParserRoutes);
 
   return fastify;
 }
