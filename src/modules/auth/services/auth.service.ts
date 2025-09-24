@@ -6,10 +6,12 @@ const prisma = new PrismaClient();
 
 export async function registerUser(
   fastify: FastifyInstance,
-  email: string,
-  password: string,
-  name: string
+  body: { email: string; password: string; name: string }
+  // email: string,
+  // password: string,
+  // name: string
 ): Promise<User> {
+  const { email, password, name } = body;
   fastify.log.info(`Registering user: ${email}`);
   try {
     const hashedPassword = await fastify.bcrypt.hash(password);
@@ -27,9 +29,12 @@ export async function registerUser(
 
 export async function loginUser(
   fastify: FastifyInstance,
-  email: string,
-  password: string
+  body: { email: string; password: string }
+  // email: string,
+  // password: string
 ): Promise<{ token: string }> {
+  const { email, password } = body;
+
   fastify.log.info(`Logging in user: ${email}`);
   try {
     const user = await prisma.user.findUnique({ where: { email } });

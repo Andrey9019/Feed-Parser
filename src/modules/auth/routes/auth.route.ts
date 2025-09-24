@@ -10,8 +10,8 @@ export async function authRoutes(fastify: FastifyInstance) {
     "/register",
     { schema: registrSchema },
     async (request, reply) => {
-      const { email, password, name } = request.body;
-      const user = await registerUser(fastify, email, password, name);
+      // const { email, password, name } = request.body;
+      const user = await registerUser(fastify, request.body);
       reply.code(201);
       return reply.send(user);
     }
@@ -21,8 +21,8 @@ export async function authRoutes(fastify: FastifyInstance) {
     "/login",
     { schema: loginSchema },
     async (request, reply) => {
-      const { email, password } = request.body;
-      const result = await loginUser(fastify, email, password);
+      // const { email, password } = request.body;
+      const result = await loginUser(fastify, request.body);
       fastify.log.info(`Login response: ${JSON.stringify(result)}`);
       return reply.send(result);
     }
