@@ -1,33 +1,33 @@
-# --- Stage 1: Build ---
+# --- Stage 1 : Build ---
 FROM node:20-alpine AS build
 
 WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --frozen-lockfile
+RUN npm i --frozen-lockfile
 
 COPY . .
-# Генерація Prisma
+# Генерация Prisma
 RUN npx prisma generate --schema=./src/prisma/schema.prisma
 RUN npm run build
 
-# --- Stage 2: Runtime ---
+# --- Stage 2 : Runtime ---
 FROM node:20-alpine AS runtime
 
 WORKDIR /app
 
 ENV NODE_ENV=production
 
-# Копіюємо package.json та package-lock.json для продакшен-залежностей
+# Копируєм package.json та package-lock.json для встановлення продакшн залежностей
+
 COPY --from=build /app/package.json /app/package-lock.json ./
-RUN npm ci --production --frozen-lockfile
+RUN npm i --production --frozen-lockfile
 
-# Копіюємо зібраний код
+# Копіюєм зібраний код з першого етапу
 COPY --from=build /app/build ./build
-COPY --from=build /app/src/prisma/generated/prisma ./src/prisma/generated/prisma
+COPY --from=build /app.src/prisma/generated/prisma ./src/prisma/generated/prisma
 
-# Виставляємо порт
+# Виставляєм порт
 EXPOSE 3000
-
-# Команда для запуску
-CMD ["npm", "start"]
+# Команда для запуску додатку
+CMD ["node", "build/index.js"]
