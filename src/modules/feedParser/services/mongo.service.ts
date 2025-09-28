@@ -1,8 +1,9 @@
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
+import { prisma } from "../../../prisma/client";
 import type { FastifyInstance } from "fastify";
 import type { Feed, NewsItem } from "../types";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 export async function getFeedFromDB(
   fastify: FastifyInstance,
