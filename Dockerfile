@@ -8,7 +8,7 @@ RUN npm i --frozen-lockfile
 
 COPY . .
 # Генерация Prisma
-RUN npx prisma generate --schema=./src/prisma/schema.prisma
+RUN npx prisma generate --schema=./prisma/schema.prisma
 RUN npm run build
 
 # --- Stage 2 : Runtime ---
@@ -25,7 +25,7 @@ RUN npm i --production --frozen-lockfile
 
 # Копіюєм зібраний код з першого етапу
 COPY --from=build /app/build ./build
-COPY --from=build /app.src/prisma/generated/prisma ./src/prisma/generated/prisma
+# COPY --from=build /app/prisma/generated/prisma ./prisma/generated/prisma
 
 # Виставляєм порт
 EXPOSE 3000
