@@ -25,7 +25,7 @@ RUN npm i --production --frozen-lockfile
 
 # Копіюєм зібраний код з першого етапу
 COPY --from=build /app/build ./build
-# COPY --from=build /app/prisma/generated/prisma ./prisma/generated/prisma
+COPY --from=build /app/prisma/generated/prisma ./prisma/generated/prisma
 
 # Виставляєм порт
 EXPOSE 3000
