@@ -11,7 +11,7 @@ export default fp(
 			openapi: {
 				info: {
 					title: "Server API",
-					description: "API documentation for the Feed Parser server https://feed-parser-uqoi.onrender.com/",
+					description: "API documentation for the Feed Parser server https://feed-parser-uqoi.onrender.com/feed",
 					contact: {
 						name: "Andrii Zirchenko",
 						url: "https://github.com/Andrey9019",

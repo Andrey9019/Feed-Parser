@@ -2,7 +2,6 @@ import Fastify, { type FastifyServerOptions } from "fastify";
 import fastifyBcrypt from "fastify-bcrypt";
 import AutoLoad from "@fastify/autoload";
 import configPlugin from "./config";
-import cors from "@fastify/cors";
 import { join } from "node:path";
 import jwt from "@fastify/jwt";
 
@@ -59,13 +58,6 @@ async function buildApp(options: AppOptions = {}) {
 
   await fastify.register(articleParserRoutes);
 
-  // fastify.register(cors, { origin: "http://localhost:5173" });
-  fastify.register(cors, {
-    origin:
-      process.env.NODE_ENV === "production"
-        ? process.env.FRONTEND_URL
-        : "http://localhost:5173",
-  });
 
   return fastify;
 }
