@@ -23,9 +23,11 @@ ENV NODE_ENV=production
 COPY --from=build /app/package.json /app/package-lock.json ./
 RUN npm i --production --frozen-lockfile
 
+# Копируєм Prisma schema та генеруєм клиєнт
+COPY --from=build /app/prisma/schema.prisma ./prisma/schema.prisma
+RUN npx prisma generate --schema=./prisma/schema.prisma
 # Копіюєм зібраний код з першого етапу
 COPY --from=build /app/build ./build
-# COPY --from=build /app/prisma/generated/prisma ./prisma/generated/prisma
 
 # Виставляєм порт
 EXPOSE 3000
